@@ -135,8 +135,6 @@ class EsParser27 extends EsParserAbstract
                 }
                 $es->horizontalSize = ($picWidthInMbsMinus1 + 1) * 16 - $cropUnitX * ($frameCropRightOffset ?? 0);
                 $es->verticalSize = (2 - $frameMbsOnlyFlag) * ($picHeightInMapUnitsMinus1 + 1) * 16 - $cropUnitY * ($frameCropBottomOffset ?? 0);
-//                var_dump($es->horizontalSize);
-//                var_dump($es->verticalSize);
             }
         }
         return $es ?? null;

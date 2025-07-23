@@ -26,11 +26,8 @@ class EsParser2 extends EsParserAbstract
             $es->verticalSize = ($tmp >> 8) & 0xFFF;
             $es->aspectRatio = ($tmp >> 4) & 0xF;
             $es->frameRate = $tmp & 0xF;
-//            var_dump($es->horizontalSize);
-//            var_dump($es->verticalSize);
             $tmp = unpack("N", substr($data, $esPointer, 4))[1];
             $es->bitrate = $tmp >> 14;
-//            var_dump($es->bitrate);
         }
         return $es ?? null;
     }
