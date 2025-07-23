@@ -28,6 +28,8 @@ namespace PhpBg\DvbPsi\Context;
 
 
 use Evenement\EventEmitter;
+use PhpBg\DvbPsi\PesParser\Pes;
+use PhpBg\DvbPsi\Tables\Nit;
 use PhpBg\DvbPsi\Tables\Pat;
 use PhpBg\DvbPsi\Tables\Pmt;
 use PhpBg\DvbPsi\Tables\Sdt;
@@ -48,13 +50,22 @@ class StreamContext extends EventEmitter
      * Array of PMTs, by program number
      * @var Pmt[]
      */
-    public $pmts;
+    public $pmts = [];
 
     /**
      * @var Sdt[]
      */
-    public $sdts;
+    public $sdts = [];
 
+    /**
+     * @var Nit[]
+     */
+    public $nits = [];
+
+    /**
+     * @var Pes[]
+     */
+    public $pes = [];
 
     public function addPat(Pat $pat)
     {
@@ -95,10 +106,27 @@ class StreamContext extends EventEmitter
         }
     }
 
+    public function addNit(Nit $nit)
+    {
+        if (!isset($this->nits[$nit->networkId])
+            || $this->nits[$nit->networkId]->versionNumber < $nit->versionNumber
+            || ($this->nits[$nit->networkId]->versionNumber !== 0 && $nit->versionNumber === 0)
+        ) {
+            $this->nits[$nit->networkId] = $nit;
+            $this->emit('nit-update', [$nit]);
+        }
+
+    }
+
     public function setTdtTimestamp(int $tdtTimestamp)
     {
         $this->tdtTimestamp = $tdtTimestamp;
         $this->emit('time-update');
+    }
+
+    public function addPes(Pes $pes)
+    {
+        $this->pes[$pes->pid] = $pes;
     }
 
     public function __toString()

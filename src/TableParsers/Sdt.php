@@ -27,7 +27,6 @@
 namespace PhpBg\DvbPsi\TableParsers;
 
 use PhpBg\DvbPsi\Exception;
-use PhpBg\DvbPsi\Tables\EitEvent;
 use PhpBg\DvbPsi\Tables\Identifier;
 use PhpBg\DvbPsi\Tables\SdtService;
 use PhpBg\MpegTs\Pid;

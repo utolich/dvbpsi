@@ -66,10 +66,15 @@ use PhpBg\DvbPsi\TableParsers\TableParserInterface;
  * parserRemove event:
  *     The `parserRemove` will be emitted when a parser is removed
  *
+ * pes event:
+ *     The `pes` event will be emitted when an PES packet is decoded
+ *     The event will receive a single argument: PhpBg\DvbPsi\PesParser\Pes instance
+ *
  * TODO other events?
  */
 class Parser extends EventEmitter
 {
+    protected $pesPids = [];
     protected $parsers = [];
 
     /**
@@ -130,9 +135,21 @@ class Parser extends EventEmitter
     public function write(int $pid, string $data)
     {
         try {
-            $this->feed($pid, $data);
+            if (array_key_exists($pid, $this->pesPids)) {
+                $this->feedPes($pid, $data);
+            } else {
+                $this->feed($pid, $data);
+            }
         } catch (\Exception $e) {
             $this->emit('error', [$e]);
+        }
+    }
+
+    protected function feedPes($pid, $data) {
+        $pesParser = new \PhpBg\DvbPsi\PesParser\Parser();
+        if ($pes = $pesParser->parse($data, $this->pesPids[$pid])) {
+            $pes->pid = $pid;
+            $this->emit('pes', [$pes]);
         }
     }
 
@@ -187,4 +204,13 @@ class Parser extends EventEmitter
             $currentPointer += $sectionLength;
         }
     }
+
+    public function addPesPidFilter($pid, $streamType) {
+        $this->pesPids[$pid] = $streamType;
+    }
+
+    public function removePesPidFilter($pid) {
+        unset($this->pesPids[$pid]);
+    }
+
 }

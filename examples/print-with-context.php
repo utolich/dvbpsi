@@ -73,6 +73,14 @@ $dvbPsiParser->on('nit', function ($nit) use ($globalContext) {
 $dvbPsiParser->on('pmt', function ($pmt) use ($streamContext) {
     $streamContext->addPmt($pmt);
 });
+$this->dvbPsiParser->on('pes', function ($pes) {
+    // if need ES params (like ffprobe) parse once
+    if ($pes->es instanceof \PhpBg\DvbPsi\PesParser\Es\Es) {
+        $this->streamContext->addPes($pes);
+        $this->mpegTsParser->removePidFilter(new \PhpBg\MpegTs\Pid($pes->pid));
+        $this->dvbPsiParser->removePesPidFilter($pes->pid);
+    }
+});
 
 // Create MPEG TS parser and filter all requested PIDs
 $mpegTsParser = new \PhpBg\MpegTs\Parser();
@@ -106,6 +114,12 @@ $streamContext->on('pat-update', function ($newPat, $oldPat) use ($dvbPsiParser,
             continue;
         }
         $mpegTsParser->addPidFilter(new \PhpBg\MpegTs\Pid($pid));
+    }
+});
+$this->streamContext->on('pmt-update', function ($pmt) {
+    foreach ($pmt->streams as $pid => $stream) {
+        $this->mpegTsParser->addPidFilter(new \PhpBg\MpegTs\Pid($pid));
+        $this->dvbPsiParser->addPesPidFilter($pid, $stream->streamType);
     }
 });
 

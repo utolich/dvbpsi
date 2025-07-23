@@ -26,6 +26,7 @@
 
 namespace PhpBg\DvbPsi\TableParsers;
 
+use PhpBg\DvbPsi\Descriptors\CableDeliverySystem;
 use PhpBg\DvbPsi\Descriptors\Component;
 use PhpBg\DvbPsi\Descriptors\Content;
 use PhpBg\DvbPsi\Descriptors\ExtendedEvent;
@@ -34,6 +35,7 @@ use PhpBg\DvbPsi\Descriptors\NetworkName;
 use PhpBg\DvbPsi\Descriptors\ParentalRating;
 use PhpBg\DvbPsi\Descriptors\PrivateDataSpecifier;
 use PhpBg\DvbPsi\Descriptors\PrivateDescriptors\EACEM\LogicalChannel;
+use PhpBg\DvbPsi\Descriptors\SatelliteDeliverySystem;
 use PhpBg\DvbPsi\Descriptors\ServiceDescriptor;
 use PhpBg\DvbPsi\Descriptors\ServiceList;
 use PhpBg\DvbPsi\Descriptors\ShortEvent;
@@ -145,6 +147,12 @@ abstract class TableParserAbstract implements TableParserInterface
 
             case Identifier::SERVICE_DESCRIPTOR:
                 return new ServiceDescriptor($descriptorData);
+
+            case Identifier::SATELLITE_DELIVERY_SYSTEM_DESCRIPTOR:
+                return new SatelliteDeliverySystem($descriptorData);
+
+            case Identifier::CABLE_DELIVERY_SYSTEM_DESCRIPTOR:
+                return new CableDeliverySystem($descriptorData);
 
             // Private descriptors
             case 0x83:
